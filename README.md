@@ -7,3 +7,9 @@
 
 # vOperator
 This module are under developing but it should still work just fine, it has been uploaded to make it easier for me to publish scripts at my blog https://stolpe.io
+
+# Links
+* [My PowerShell Collection](https://github.com/rstolpe/PSCollection)
+* [Twitter](https://twitter.com/rstolpes)
+* [LinkedIn](https://www.linkedin.com/in/rstolpe/)
+* [PowerShell Gallery](https://www.powershellgallery.com/profiles/rstolpe)
