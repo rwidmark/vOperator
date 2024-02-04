@@ -33,7 +33,7 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule        = '.\vOperator-pwsh.psm1'
+    RootModule        = '.\vOperator.psm1'
 
     # Version number of this module.
     ModuleVersion     = '0.0.1'
@@ -119,19 +119,19 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags                     = @("Horizon", "vmware-horizon", "VMWare", "PowerShell", "Support-Tools", "IT-Tools", "sysadmin-tools")
+            Tags                     = @("Horizon", "vmware-horizon", "vmware-vsphere", "vsphere", "VMWare", "PowerShell", "Support-Tools", "IT-Tools", "sysadmin-tools")
 
             # A URL to the license for this module.
-            LicenseUri               = 'https://github.com/rstolpe/vOperator-pwsh/blob/main/LICENSE'
+            LicenseUri               = 'https://github.com/rstolpe/vOperator/blob/main/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri               = 'https://github.com/rstolpe/vOperator-pwsh'
+            ProjectUri               = 'https://github.com/rstolpe/vOperator'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes             = 'https://github.com/rstolpe/vOperator-pwsh/releases'
+            ReleaseNotes             = 'https://github.com/rstolpe/vOperator/releases'
 
             # Prerelease string of this module
             #Prerelease               = ''
