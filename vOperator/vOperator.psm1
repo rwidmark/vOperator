@@ -343,12 +343,12 @@ Function Get-hvVM {
             $APICall = Convert-hvAPIFilter -Filter $filtersAPI -FilterType And -hvURI $hvURI -accessToken $accessToken -SortBy "name" -restMethod "/inventory/v5/machines" -Pagination -Type Filter
             $LogText = "VM $FilterName $FilterValue"
         }
-        if ($APICall.ReturnCode -eq 0 -and $APICall.ReturnValue.Count -gt 0) {
+        if ($APICall.ReturnCode -eq 0 -and $APICall.ReturnValue.Count -gt 0 -and $null -ne $APICall.ReturnValue.id) {
             return Get-ReturnMessageTemplate -ReturnType Success -Message "Information about $LogText have been collected." -ReturnValue $($APICall.ReturnValue)
             Break
         }
         else {
-            return Get-ReturnMessageTemplate -ReturnType Error -Message "Information about $LogText could not be collected." -ReturnValue $APICall
+            return Get-ReturnMessageTemplate -ReturnType Error -Message "Information about $LogText could not be collected." -ReturnValue $($APICall.ReturnValue)
             Break
         }
     }
@@ -1028,6 +1028,320 @@ Function Get-hvVirtualCenterVM {
         }
         else {
             return Get-ReturnMessageTemplate -ReturnType Error -Message "Could not collect VMs from Vritual Center ID $VirtualCenterID, StatusCode: $StatusCode" -ReturnValue "StatusCode: $StatusCode"
+            Break
+        }
+    }
+    catch {
+        return Get-ReturnMessageTemplate -ReturnType Error -Message "$($PSItem.Exception.Message)" -ReturnValue "$($PSItem.Exception)"
+        Break
+    }
+}
+Function Send-hvVMAction {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName, HelpMessage = "AccessToken to Horizon")]
+        [ValidateNotNullOrEmpty()]
+        [SecureString]$accessToken,
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName, HelpMessage = "Connection Server FQDN")]
+        [ValidateScript({ $_ -notlike "https://*" })]
+        [string]$hvURI,
+        [Parameter(Mandatory = $true, HelpMessage = "Name of the VM")]
+        [ValidateNotNullOrEmpty()]
+        [string]$VM,
+        [Parameter(Mandatory = $true, HelpMessage = "What you want to do")]
+        [ValidateSet("enter-maintenance", "exit-maintenance", "reset", "recover", "rebuild", "restart", "archive")]
+        [string]$Action,
+        [Parameter(Mandatory = $false, HelpMessage = "Force action, only works with enter-maintenance, restart, reset and recover")]
+        [switch]$Force = $false
+    )
+
+    try {
+        $GetVM = Get-hvVM -accessToken $accessToken -hvURI $hvURI -FilterValue "$($VM)"
+        if ($GetVM.ReturnCode -eq 0) {
+            [String]$VMID = $($GetVM.ReturnValue.Id)
+        }
+        else {
+            return $GetVM
+            Break
+        }
+
+        if ($Force -eq $true -and $Action -notlike "exit-maintenance" -and $Action -notlike "archive" -and $Action -notlike "rebuild") {
+            $endUrl = "?force=true"
+        }
+        else {
+            $endUrl = ""
+        }
+
+        $Body = "[$($VMID  | ConvertTo-Json -Compress)]"
+
+        $APICall = Invoke-RestMethod -Uri "https://$($hvURI)/rest/inventory/v1/machines/action/$($Action)/$($endUrl)" -Method POST -Body $Body -Authentication Bearer -Token $accessToken -ContentType "application/json" -StatusCodeVariable "StatusCode" -HttpVersion 3.0
+        if ($StatusCode -eq 200 -and $APICall.Status_Code -eq 200) {
+            return Get-ReturnMessageTemplate -ReturnType Success -Message "VM $VM has now $Action"
+            Break
+        }
+        else {
+            return Get-ReturnMessageTemplate -ReturnType Error -Message "Could not $Action for VM $VM, API Status Code: $StatusCode Call Status Code: $($APICall.Status_Code)" -ReturnValue $APICall
+            Break
+        }
+    }
+    catch {
+        return Get-ReturnMessageTemplate -ReturnType Error -Message "$($PSItem.Exception.Message)"
+        break
+    }
+}
+Function Get-hvVirtualMachineAge {
+    <#
+        .SYNOPSIS
+        Collect all VMs from a specific pool that are available and older than a specific time
+
+        .DESCRIPTION
+
+
+        .PARAMETER hvURI
+        FQDN to one Connection Server in the POD
+
+        .PARAMETER accessToken
+        Access token for authentication.
+        You can collect it by using Connect-hvSrv
+
+        .PARAMETER State
+        What state you want to filter VM on, if you don't use this parameter it will filter on AVAILABLE
+
+        .PARAMETER PoolName
+        Name of the pool you want to collect VMs from
+
+        .PARAMETER Days
+        Collect VMs that are older than this amount of days, default is 0.
+        You can combined this with Hours and Minutes, at least one of the parameters days, hours or minutes need to be used.
+
+        .PARAMETER Hours
+        Collect VMs that are older than this amount of hours, default is 0.
+        You can combined this with Days and Minutes, at least one of the parameters days, hours or minutes need to be used.
+
+        .PARAMETER Minutes
+        Collect VMs that are older than this amount of minutes, default is 0.
+        You can combined this with Days and Hours, at least one of the parameters days, hours or minutes need to be used.
+
+        .PARAMETER Collect
+        If you use this switch it will collect all VMs that are older than the time you have specified and return them as a object.
+        Collect switch can't be used together with Confirm switch.
+
+        .PARAMETER Confirm
+        If you use this switch it will ask you if you really want to delete the VMs that are older than the time you have specified before it deletes them.
+        Confirm switch can't be used together with Collect switch.
+
+        .EXAMPLE
+        .LINK
+
+        .NOTES
+        Author:         Robin Stolpe
+        Private:        robin@stolpe.io
+        Twitter / X:    https://twitter.com/rstolpes
+        Website:        https://stolpe.io
+    #>
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName, HelpMessage = "Enter FQDN to one Connection Server")]
+        [ValidateNotNullOrEmpty()]
+        [string]$hvURI,
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName, HelpMessage = "Access token for authentication")]
+        [ValidateNotNullOrEmpty()]
+        [SecureString]$accessToken,
+        [Parameter(Mandatory = $false, HelpMessage = "Filter on state of the VM")]
+        [ValidateSet("AVAILABLE", "ASSIGNED", "UNASSIGNED", "ARCHIVED")]
+        [string]$State = "AVAILABLE",
+        [Parameter(Mandatory = $false, HelpMessage = "Name of the pool")]
+        [string]$PoolName,
+        [Parameter(Mandatory = $false, HelpMessage = "How old in days should the VM be")]
+        [int]$Days = 0,
+        [Parameter(Mandatory = $false, HelpMessage = "How old in hours should the VM be")]
+        [int]$Hours = 0,
+        [Parameter(Mandatory = $false, HelpMessage = "How old in minutes should the VM be")]
+        [int]$Minutes = 0,
+        [Parameter(Mandatory = $false, HelpMessage = "Collecting all VMs, not deleting them")]
+        [switch]$Collect = $false,
+        [Parameter(Mandatory = $false, HelpMessage = "Make sure that you really want to delete the VMs before it deletes them")]
+        [switch]$Confirm = $false
+    )
+
+    try {
+        if ($Days -eq 0 -and $Hours -eq 0 -and $Minutes -eq 0) {
+            return Get-ReturnMessageTemplate -ReturnType Error -Message "You need to enter a value for Days, Hours or Minutes"
+            Break
+        }
+
+        if ($Confirm -eq $true -and $Collect -eq $true) {
+            return Get-ReturnMessageTemplate -ReturnType Error -Message "You can't use Confirm and Delete at the same time"
+            Break
+        }
+
+        $textTimePeriod = "$(if ($Days -gt 0) { "$($Days) days " })$(if ($Hours -gt 0) { "$($Hours) hours " })$(if ($Minutes -gt 0) { "$($Minutes) minutes" })"
+
+        # Collecting all information about the pool
+        $GetPoolInfo = Get-hvDesktopPool -hvURI $hvURI -accessToken $accessToken -FilterValue $PoolName
+        if ($GetPoolInfo.ReturnCode -eq 0) {
+            # Collecting all VMs from the pool
+            $GetPoolVM = Get-hvVM -hvURI $hvURI -accessToken $accessToken -FilterName "desktop_pool_id" -FilterValue $($GetPoolInfo.ReturnValue.Id)
+
+            # Filter VMs to the on that are not in use by any user
+            $AvailableVMs = $GetPoolVM.ReturnValue | Where-Object { $_.state -eq $State }
+
+            # Get todays date
+            $Today = Get-Date
+
+            # Filter out VMs according to the parameters
+            $FilterAge = foreach ($_vm in $AvailableVMs) {
+                $VMAge = [datetimeoffset]::FromUnixTimeMilliseconds($_vm.managed_machine_data.create_time).DateTime
+                $ConvertAge = New-TimeSpan -Start $VMAge -End $Today
+                if ($ConvertAge.Days -ge $Days -and $ConvertAge.Hours -ge $Hours -and $ConvertAge.Minutes -ge $Minutes) {
+                    $_vm
+                }
+            }
+
+            if ($FilterAge.Count -eq 0) {
+                return Get-ReturnMessageTemplate -ReturnType Success -Message "There are no VMs that are older than $($textTimePeriod)in pool $($PoolName)" -ReturnValue $FilterAge
+                Break
+            }
+            else {
+                if ($Collect -eq $true) {
+                    return Get-ReturnMessageTemplate -ReturnType Success -Message "All VMs that are older than $($textTimePeriod)from $($PoolName) have been collected" -ReturnValue $FilterAge
+                    Break
+                }
+                elseif ($Confirm -eq $true) {
+                    $UserAnswer = Read-Host "Do you really want to delete all VMs that are older than $($textTimePeriod)from $($PoolName)? (y/n)"
+                    if ($UserAnswer -eq "y") {
+                        $ReturnValue = foreach ($_vm in $FilterAge) {
+                            $DeleteVM = Remove-hvVM -hvURI $hvURI -accessToken $accessToken -VM $_vm.name
+                            if ($DeleteVM.ReturnCode -eq 0) {
+                                $DeleteVM.Message
+                            }
+                            else {
+                                $DeleteVM.ReturnValue
+                            }
+                        }
+                        return Get-ReturnMessageTemplate -ReturnType Success -Message "All VMs that was older then $($textTimePeriod)have been deleted from $($PoolName)" -ReturnValue $ReturnValue
+                    }
+                    elseif ($UserAnswer -eq "n") {
+                        return Get-ReturnMessageTemplate -ReturnType Success -Message "You have chosen not to delete any VMs"
+                        Break
+                    }
+                    else {
+                        return Get-ReturnMessageTemplate -ReturnType Error -Message "You need to enter y or n"
+                        Break
+                    }
+
+                }
+                else {
+                    $ReturnValue = foreach ($_vm in $FilterAge) {
+                        $DeleteVM = Remove-hvVM -hvURI $hvURI -accessToken $accessToken -VM $_vm.name
+                        if ($DeleteVM.ReturnCode -eq 0) {
+                            $DeleteVM.Message
+                        }
+                        else {
+                            $DeleteVM.ReturnValue
+                        }
+                    }
+                    return Get-ReturnMessageTemplate -ReturnType Success -Message "All VMs that was older then $($textTimePeriod)have been deleted from $($PoolName)" -ReturnValue $ReturnValue
+                }
+            }
+        }
+        else {
+            return $GetPoolInfo
+            Break
+        }
+    }
+    catch {
+        return Get-ReturnMessageTemplate -ReturnType Error -Message "$($PSItem.Exception.Message)" -ReturnValue "$($PSItem.Exception)"
+        Break
+    }
+}
+Function Get-hvDataStorePath {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName, HelpMessage = "Enter FQDN to one Connection Server")]
+        [ValidateNotNullOrEmpty()]
+        [string]$hvURI,
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName, HelpMessage = "Access token for authentication")]
+        [ValidateNotNullOrEmpty()]
+        [SecureString]$accessToken,
+        [Parameter(Mandatory = $true, HelpMessage = "Virtual Center ID")]
+        [ValidateNotNullOrEmpty()]
+        [string]$vCenterID,
+        [Parameter(Mandatory = $true, HelpMessage = "Datastore ID")]
+        [ValidateNotNullOrEmpty()]
+        [string]$DatastoreID
+    )
+
+    try {
+        $APICall = Invoke-RestMethod -Uri "https://$($hvURI)/rest/external/v1/datastore-paths?vcenter_id=$($vCenterID)&datastore_id=$($DatastoreID)" -Method Get -Authentication Bearer -Token $accessToken -ContentType "application/json" -StatusCodeVariable "StatusCode" -HttpVersion 3.0
+        if ($StatusCode -eq 200) {
+            return Get-ReturnMessageTemplate -ReturnType Success -Message "Information about datastore path has been collected." -ReturnValue $APICall
+            Break
+        }
+        else {
+            return Get-ReturnMessageTemplate -ReturnType Error -Message "Could not collect information about Datastore Path, StatusCode: $StatusCode"
+            Break
+        }
+    }
+    catch {
+        return Get-ReturnMessageTemplate -ReturnType Error -Message "$($PSItem.Exception.Message)" -ReturnValue "$($PSItem.Exception)"
+        Break    
+    }
+}
+Function Remove-hvVM {
+    <#
+        .SYNOPSIS
+        .DESCRIPTION
+        .PARAMETER hvURI
+        .PARAMETER accessToken
+        .PARAMETER VM
+        .PARAMETER VirtualCenterID
+        .EXAMPLE
+        .LINK
+        .NOTES
+        Author:         Robin Stolpe
+        Private:        robin@stolpe.io
+        Twitter / X:    https://twitter.com/rstolpes
+        Website:        https://stolpe.io
+    #>
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName, HelpMessage = "Enter FQDN to one Connection Server")]
+        [ValidateNotNullOrEmpty()]
+        [string]$hvURI,
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName, HelpMessage = "Access token for authentication")]
+        [ValidateNotNullOrEmpty()]
+        [SecureString]$accessToken,
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName, HelpMessage = "Name of the VM")]
+        [ValidateNotNullOrEmpty()]
+        [string]$VM
+    )
+
+    try {
+
+        $VerifyVM = Get-hvVM -hvURI $hvURI -accessToken $accessToken -FilterValue $VM
+        if ($VerifyVM.ReturnCode -eq 0) {
+            $VMID = $($VerifyVM.ReturnValue.id -as [string])
+        }
+        else {
+            return $VerifyVM
+            Break
+        }
+
+        $Body = [ordered]@{
+            'allow_delete_from_multi_desktop_pools' = $false
+            "delete_from_disk"                      = $true
+            "force_logoff_session"                  = $true
+        }
+
+        $APICall = Invoke-RestMethod -Uri "https://$($hvURI)/rest/inventory/v1/machines/$($VMID)" -Method Delete -Body ($Body | ConvertTO-JSON) -ContentType "application/json" -Authentication Bearer -Token $accessToken -HttpVersion 3.0 -StatusCodeVariable "StatusCode"
+
+        if ($StatusCode -eq 204) {
+            return Get-ReturnMessageTemplate -ReturnType Success -Message "VM $($VM) have been deleted from VMWare Horizon, this can take some time."
+            Break 
+        }
+        else {
+            return Get-ReturnMessageTemplate -ReturnType Error -Message "Something went wrong when trying to delete VM $($VM), Status Code $($StatusCode)" -ReturnValue $APICall
             Break
         }
     }

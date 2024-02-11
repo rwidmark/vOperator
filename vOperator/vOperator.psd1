@@ -93,7 +93,7 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = "Get-hvVirtualCenterVM", "Get-hvVirtualCenter", "Connect-hvSrv", "Convert-hvAPI", "Set-hvVMPool", "Get-hvDesktopPool", "Set-hvVMUserAssignment", "Get-hvVM", "Disconnect-hvSrv", "Get-ReturnMessageTemplate", "Convert-hvAPIFilter"
+    FunctionsToExport = "Send-hvVMAction", "Get-hvDataStorePath", "Get-hvVirtualMachineAge", "Remove-hvVM", "Get-hvVirtualCenterVM", "Get-hvVirtualCenter", "Connect-hvSrv", "Convert-hvAPI", "Set-hvVMPool", "Get-hvDesktopPool", "Set-hvVMUserAssignment", "Get-hvVM", "Disconnect-hvSrv", "Get-ReturnMessageTemplate", "Convert-hvAPIFilter"
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = @()
@@ -134,7 +134,7 @@
             ReleaseNotes             = 'https://github.com/rstolpe/vOperator/releases'
 
             # Prerelease string of this module
-            Prerelease               = 'beta'
+            Prerelease               = 'beta2'
 
             # Flag to indicate whether the module requires explicit user acceptance for install/update/save
             RequireLicenseAcceptance = $false
