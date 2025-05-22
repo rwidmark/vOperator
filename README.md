@@ -4,7 +4,7 @@
 ![PSGallery downloads](https://img.shields.io/powershellgallery/dt/vOperator?style=plastic)  
 
 # vOperator
-This module are under developing but it should still work just fine, you can read more about it in my [blog](https://stolpe.io)
+This module are under developing but it should still work just fine, you can read more about it in my [blog](https://widmark.dev)
 
 # Links
 * [My PowerShell Collection](https://github.com/rwidmark/PSCollection)
