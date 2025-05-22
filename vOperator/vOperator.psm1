@@ -165,10 +165,14 @@ Function Get-ReturnMessageTemplate {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
 
     [CmdletBinding()]
@@ -255,10 +259,14 @@ Function Disconnect-hvSrv {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
     
     [CmdletBinding()]
@@ -309,10 +317,14 @@ Function Get-hvVM {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
     [CmdletBinding()]
     Param(
@@ -384,10 +396,14 @@ Function Set-hvVMUserAssignment {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
 
     [CmdletBinding()]
@@ -474,10 +490,14 @@ Function Get-hvDesktopPool {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
 
     [CmdletBinding()]
@@ -547,10 +567,14 @@ Function Set-hvVMPool {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
     [CmdletBinding()]
     Param(
@@ -831,10 +855,14 @@ Function Connect-hvSrv {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
 
     [CmdletBinding()]
@@ -932,10 +960,14 @@ Function Get-hvVirtualCenter {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
     [CmdletBinding()]
     Param(
@@ -992,10 +1024,14 @@ Function Get-hvVirtualCenterVM {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
     [CmdletBinding()]
     Param(
@@ -1134,10 +1170,14 @@ Function Get-hvVirtualMachineAge {
         .LINK
 
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
     [CmdletBinding()]
     Param(
@@ -1299,10 +1339,14 @@ Function Remove-hvVM {
         .EXAMPLE
         .LINK
         .NOTES
-        Author:         Robin Stolpe
-        Private:        robin@stolpe.io
-        Twitter / X:    https://twitter.com/rstolpes
-        Website:        https://stolpe.io
+        Author:         Robin Widmark
+        Mail:           robin@widmark.dev
+        Website/Blog:   https://widmark.dev
+        X:              https://x.com/widmark_robin
+        Mastodon:       https://mastodon.social/@rwidmark
+		YouTube:		https://www.youtube.com/@rwidmark
+        Linkedin:       https://www.linkedin.com/in/rwidmark/
+        GitHub:         https://github.com/rwidmark
     #>
     [CmdletBinding()]
     Param(
